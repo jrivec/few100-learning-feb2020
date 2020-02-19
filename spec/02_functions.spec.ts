@@ -170,6 +170,83 @@ describe('writing functions', () => {
             });
         });
     });
+    describe('a couple of examples', () => {
+        it('working with something other than integer', () => {
+            interface Vehicle { vin: string; make: string; model: string; year: number; mileage: number; }
 
+            const data: Vehicle[] = [
+                { vin: '123456', make: 'ford', model: 'explorer', year: 2013, mileage: 100013 },
+                { vin: '123456', make: 'honda', model: 'pilot', year: 2019, mileage: 1323 },
+                { vin: '123456', make: 'chevy', model: 'bolt', year: 2018, mileage: 223338 }
+            ];
+            const results = data
+                .filter(v => v.mileage > 100000)
+                .map(v => `${v.make} ${v.model}`);
+
+            expect(results).toEqual(['ford explorer', 'chevy bolt']);
+
+            const results2 = data
+                .filter(v => v.year > 2015)
+                .map(v => v.mileage)
+                .reduce((s, n) => s + n);
+
+            expect(results2).toBe(1323 + 223338);
+        });
+        it('simple redux for dummies', () => {
+
+            interface State {
+                count: number;
+            }
+
+            const initialState: State = {
+                count: 0
+            };
+
+            interface Action { type: string; }
+
+            class Increment implements Action {
+                readonly type = 'Increment';
+            }
+
+            class Decrement implements Action {
+                readonly type = 'Decrement';
+            }
+            class Reset implements Action {
+                readonly type = 'Reset';
+            }
+
+            const allTheThingsThatHappened: Action[] = [
+                new Increment(),
+                new Increment(),
+                new Increment(),
+                new Increment(),
+                new Reset(),
+                new Increment(),
+                new Increment(),
+                new Increment(),
+                new Decrement(),
+                new Increment()
+            ];
+
+            const finalCount = allTheThingsThatHappened.reduce((s: State, n: Action) => {
+                switch (n.type) {
+                    case 'Increment':
+                        return {
+                            count: s.count + 1
+                        };
+                    case 'Decrement':
+                        return {
+                            count: s.count - 1
+                        };
+
+                    case 'Reset': {
+                        return initialState;
+                    }
+                }
+            }, initialState);
+
+            expect(finalCount.count).toBe(3);
+        });
+    });
 });
 
